@@ -1,0 +1,23 @@
+syntax = "proto3";
+package whinvitesvr;
+message EchoReq{
+	string name = 2;
+}
+message EchoRsp{
+	string message = 1;
+}
+
+message GetInviteInfoReq{
+  uint64 uid = 1;
+  string src = 2;
+}
+
+message GetInviteInfoRsp{
+  string vcode = 1;
+}
+
+service WhinviteSvr{
+	rpc Echo(EchoReq) returns (EchoRsp) {}
+	rpc GetInviteInfo(GetInviteInfoReq) returns (GetInviteInfoRsp) {}
+}
+
