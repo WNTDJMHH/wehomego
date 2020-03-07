@@ -1,0 +1,10 @@
+syntax = "proto3";
+package proto;
+message EchoReq{
+  uint64 uid = 1;
+	string req_str = 2;
+}
+
+message EchoRsp{
+	string echo_str = 1;
+}

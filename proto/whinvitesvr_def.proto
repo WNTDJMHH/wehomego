@@ -1,0 +1,12 @@
+syntax = "proto3";
+package proto;
+import "whcomm_def.proto";
+
+message GetInviteInfoReq{
+  uint64 uid = 1;
+	string src = 2;
+}
+
+message GetInviteInfoRsp{
+  string vcode = 1;
+}

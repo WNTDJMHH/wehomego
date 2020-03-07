@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	pb "wehome/whinvitesvr/proto"
 )
 
@@ -26,6 +27,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
+	reflection.Register(s)
 	pb.RegisterWhinviteSvrServer(s, &server{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
