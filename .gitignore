@@ -1,1 +1,8 @@
 *.swp
+*.pb.h
+*.pb.cc
+*.pb.go
+*.o
+genfiles/*
+genfiles
+
