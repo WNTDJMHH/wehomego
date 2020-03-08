@@ -50,12 +50,12 @@ greeter_server: $(PB_OBJS) greeter_server.o
 
 .PRECIOUS: $(GEN_PATH)/$(PB_NAME).grpc.pb.cc
 #$(GEN_PATH)/$(PB_NAME).grpc.pb.cc: $(PROTOS_PATH)/$(PB_NAME).proto
-$(GEN_PATH)/$(PB_NAME).grpc.pb.cc: ./proto/whstorekv.proto
+$(GEN_PATH)/$(PB_NAME).grpc.pb.cc: ./proto/$(PB_NAME).proto
 	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=$(GEN_PATH) --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
 
 .PRECIOUS: $(GEN_PATH)/$(PB_NAME).pb.cc
 #$(GEN_PATH)/$(PB_NAME).pb.cc: $(PROTOS_PATH)/$(PB_NAME).proto
-$(GEN_PATH)/$(PB_NAME).pb.cc: ./proto/whstorekv.proto
+$(GEN_PATH)/$(PB_NAME).pb.cc: ./proto/$(PB_NAME).proto
 	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=$(GEN_PATH)  $<
 
 clean:
