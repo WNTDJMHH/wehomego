@@ -29,33 +29,38 @@ LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc`\
            -ldl
 endif
 PROTOC = protoc
+PROTOS_PATH = proto 
+GEN_PATH = ./genfiles
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
-PB_OBJS: helloworld.pb.o helloworld.grpc.pb.o
+PB_NAME = helloworld
+PB_OBJS = $(GEN_PATH)/$(PB_NAME).pb.o $(GEN_PATH)/$(PB_NAME).grpc.pb.o
+BIN_PATH = /home/ubuntu/GoPath/bin
 
-PROTOS_PATH = ./proto 
-
+$(shell test -d $(GEN_PATH) || mkdir -p $(GEN_PATH))
 
 vpath %.proto $(PROTOS_PATH)
 
 all: system-check greeter_client greeter_server
-
 greeter_client: $(PB_OBJS) greeter_client.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
 greeter_server: $(PB_OBJS) greeter_server.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
-.PRECIOUS: %.grpc.pb.cc
-%.grpc.pb.cc: %.proto
-	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=. --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
+.PRECIOUS: $(GEN_PATH)/$(PB_NAME).grpc.pb.cc
+#$(GEN_PATH)/$(PB_NAME).grpc.pb.cc: $(PROTOS_PATH)/$(PB_NAME).proto
+$(GEN_PATH)/$(PB_NAME).grpc.pb.cc: ./proto/helloworld.proto
+	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=$(GEN_PATH) --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
 
-.PRECIOUS: %.pb.cc
-%.pb.cc: %.proto
-	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=. $<
+.PRECIOUS: $(GEN_PATH)/$(PB_NAME).pb.cc
+#$(GEN_PATH)/$(PB_NAME).pb.cc: $(PROTOS_PATH)/$(PB_NAME).proto
+$(GEN_PATH)/$(PB_NAME).pb.cc: ./proto/helloworld.proto
+	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=$(GEN_PATH)  $<
 
 clean:
 	rm -f *.o *.pb.cc *.pb.h greeter_client greeter_server
+	rm -rdf $(GEN_PATH)
 
 
 # The following is to test your system and ensure a smoother experience.
