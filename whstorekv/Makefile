@@ -33,7 +33,7 @@ PROTOS_PATH = proto
 GEN_PATH = ./genfiles
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
-PB_NAME = helloworld
+PB_NAME = whstorekv
 PB_OBJS = $(GEN_PATH)/$(PB_NAME).pb.o $(GEN_PATH)/$(PB_NAME).grpc.pb.o
 BIN_PATH = /home/ubuntu/GoPath/bin
 
@@ -50,12 +50,12 @@ greeter_server: $(PB_OBJS) greeter_server.o
 
 .PRECIOUS: $(GEN_PATH)/$(PB_NAME).grpc.pb.cc
 #$(GEN_PATH)/$(PB_NAME).grpc.pb.cc: $(PROTOS_PATH)/$(PB_NAME).proto
-$(GEN_PATH)/$(PB_NAME).grpc.pb.cc: ./proto/helloworld.proto
+$(GEN_PATH)/$(PB_NAME).grpc.pb.cc: ./proto/whstorekv.proto
 	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=$(GEN_PATH) --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
 
 .PRECIOUS: $(GEN_PATH)/$(PB_NAME).pb.cc
 #$(GEN_PATH)/$(PB_NAME).pb.cc: $(PROTOS_PATH)/$(PB_NAME).proto
-$(GEN_PATH)/$(PB_NAME).pb.cc: ./proto/helloworld.proto
+$(GEN_PATH)/$(PB_NAME).pb.cc: ./proto/whstorekv.proto
 	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=$(GEN_PATH)  $<
 
 clean:
