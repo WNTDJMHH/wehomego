@@ -41,12 +41,16 @@ $(shell test -d $(GEN_PATH) || mkdir -p $(GEN_PATH))
 
 vpath %.proto $(PROTOS_PATH)
 
-all: system-check greeter_client greeter_server
-greeter_client: $(PB_OBJS) greeter_client.o
+all: system-check $(BIN_PATH)/greeter_client $(BIN_PATH)/greeter_server
+
+$(BIN_PATH)/greeter_client: $(PB_OBJS) $(GEN_PATH)/greeter_client.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
-greeter_server: $(PB_OBJS) greeter_server.o
+$(BIN_PATH)/greeter_server: $(PB_OBJS) $(GEN_PATH)/greeter_server.o
 	$(CXX) $^ $(LDFLAGS) -o $@
+
+$(GEN_PATH)/%.o:%.cc
+	gcc $^ -o $@ -c $(LDFLAGS)
 
 .PRECIOUS: $(GEN_PATH)/$(PB_NAME).grpc.pb.cc
 #$(GEN_PATH)/$(PB_NAME).grpc.pb.cc: $(PROTOS_PATH)/$(PB_NAME).proto
