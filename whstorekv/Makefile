@@ -19,15 +19,9 @@ SYSTEM ?= $(HOST_SYSTEM)
 CXX = g++
 CPPFLAGS += `pkg-config --cflags protobuf grpc`
 CXXFLAGS += -std=c++11
-ifeq ($(SYSTEM),Darwin)
-LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc`\
-           -lgrpc++_reflection\
-           -ldl
-else
-LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc`\
+LDFLAGS +=  librocksdb.a -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc`\
            -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           -ldl
-endif
+           -ldl -lpthread -lrt -lsnappy -lgflags -lz -lbz2 -llz4 -lzstd 
 PROTOC = protoc
 PROTOS_PATH = proto 
 GEN_PATH = ./genfiles
@@ -41,16 +35,16 @@ $(shell test -d $(GEN_PATH) || mkdir -p $(GEN_PATH))
 
 vpath %.proto $(PROTOS_PATH)
 
-all: system-check $(BIN_PATH)/greeter_client $(BIN_PATH)/greeter_server
+all: system-check $(BIN_PATH)/whstorekv_client $(BIN_PATH)/whstorekv_server
 
-$(BIN_PATH)/greeter_client: $(PB_OBJS) $(GEN_PATH)/greeter_client.o
+$(BIN_PATH)/whstorekv_client: $(PB_OBJS) $(GEN_PATH)/whstorekv_client.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
-$(BIN_PATH)/greeter_server: $(PB_OBJS) $(GEN_PATH)/greeter_server.o
+$(BIN_PATH)/whstorekv_server: $(PB_OBJS) $(GEN_PATH)/whstorekv_server.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
-$(GEN_PATH)/%.o:%.cc
-	gcc $^ -o $@ -c $(LDFLAGS)
+$(GEN_PATH)/%.o:%.cpp
+	g++ $^ -o $@ -c $(LDFLAGS)
 
 .PRECIOUS: $(GEN_PATH)/$(PB_NAME).grpc.pb.cc
 #$(GEN_PATH)/$(PB_NAME).grpc.pb.cc: $(PROTOS_PATH)/$(PB_NAME).proto
@@ -63,7 +57,7 @@ $(GEN_PATH)/$(PB_NAME).pb.cc: ./proto/$(PB_NAME).proto
 	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=$(GEN_PATH)  $<
 
 clean:
-	rm -f *.o *.pb.cc *.pb.h greeter_client greeter_server
+	rm -f *.o *.pb.cc *.pb.h whstorekv_client whstorekv_server
 	rm -rdf $(GEN_PATH)
 
 

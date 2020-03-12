@@ -19,6 +19,11 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <cstdio>
+
+#include "rocksdb/db.h"
+#include "rocksdb/slice.h"
+#include "rocksdb/options.h"
 
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/health_check_service_interface.h>
@@ -50,15 +55,23 @@ class WhStoreKvServiceImpl final : public WhStoreKv::Service {
                   GetRsp * ptrRsp) override {
     std::string prefix("Hello ");
 		cout << "ReqPb" << ptrReq->ShortDebugString() <<endl;
-    return Status::OK;
-  }
+		// get value
+		std::string strValue;
+		auto  s = m_ptrDb->Get(rocksdb::ReadOptions(), ptrReq->key(), &strValue);
+		ptrRsp->mutable_data()->ParseFromString(strValue);
+		cout << "RsqPb" << ptrRsp->ShortDebugString() <<endl;
+		return Status::OK;
+	}
 
-  Status Set(ServerContext* context, const SetReq * ptrReq,
-                  SetRsp * ptrRsp) override {
-    std::string prefix("Hello ");
-		cout << "ReqPb" << ptrReq->ShortDebugString() <<endl;
-    return Status::OK;
-  }
+	Status Set(ServerContext* context, const SetReq * ptrReq,
+					SetRsp * ptrRsp) override {
+			std::string prefix("Hello ");
+			cout << "ReqPb" << ptrReq->ShortDebugString() <<endl;
+			// Put key-value
+			auto  s = m_ptrDb->Put(rocksdb::WriteOptions(), ptrReq->key(), ptrReq->data().SerializeAsString());
+			cout << "Status:" << s.ok() << endl;
+			return Status::OK;
+	}
 
   Status BatchGet(ServerContext* context, const BatchGetReq * ptrReq,
                   BatchGetRsp * ptrRsp) override {
@@ -74,11 +87,24 @@ class WhStoreKvServiceImpl final : public WhStoreKv::Service {
     return Status::OK;
   }
 
+	public:
+		rocksdb::DB* m_ptrDb; 
 };
 
 void RunServer() {
   std::string server_address("0.0.0.0:50050");
   WhStoreKvServiceImpl service;
+
+	rocksdb::DB * ptrDb;
+	std::string kDBPath = "/tmp/rocksdb_simple_example";
+  rocksdb::Options options;
+  options.IncreaseParallelism();
+  options.OptimizeLevelStyleCompaction();
+  options.create_if_missing = true;
+  rocksdb::Status s = rocksdb::DB::Open(options, kDBPath, &ptrDb);
+	assert(s.ok());
+  std::cout << "DbInitOk" << kDBPath << std::endl;
+	service.m_ptrDb = ptrDb;
 
   grpc::EnableDefaultHealthCheckService(true);
   grpc::reflection::InitProtoReflectionServerBuilderPlugin();

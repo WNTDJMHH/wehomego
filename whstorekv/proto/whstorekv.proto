@@ -11,37 +11,37 @@ message HelloReply {
 
 message ValueData{
 	uint32 ver = 1;
-	bytes value = 2;
+	string value = 2;
 }
 
 message KVData{
-	bytes key = 1;
+	string key = 1;
 	ValueData values = 2;
 }
 
 message GetReq{
-	bytes key  = 1;
+	string key  = 1;
 }
 message GetRsp{
 	ValueData data = 1;
 }
 
 message SetReq{
-	bytes key  = 1;
+	string key  = 1;
 	ValueData data = 2;
 }
 message SetRsp{
 }
 
 message BatchGetReq{
-	repeated bytes keys = 1;
+	repeated string keys = 1;
 }
 message BatchGetRsp{
 	repeated KVData datas = 1;
 }
 
 message SearchKeysReq{
-	bytes key_pre = 1;
+	string key_pre = 1;
 	uint32 limit = 2;	
 	uint32 order = 3; 
 }   
